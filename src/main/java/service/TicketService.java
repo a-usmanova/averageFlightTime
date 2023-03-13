@@ -8,7 +8,10 @@ import model.TicketWrapper;
 
 import java.nio.file.Files;
 import java.nio.file.Paths;
-import java.text.SimpleDateFormat;
+import java.time.Instant;
+import java.time.ZoneId;
+import java.time.ZonedDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.*;
 
 @Data
@@ -22,10 +25,11 @@ public class TicketService {
 
     public String getAverageFlightTime() {
         if (timeOfFlights.isEmpty()) return "";
-        int averageTime = (int) timeOfFlights.stream()
+        long averageTime =  (long) timeOfFlights.stream()
                 .mapToLong(a -> a)
                 .average().orElse(0);
-        return new SimpleDateFormat("hh:mm").format(new Date(averageTime * 1000L));
+        return DateTimeFormatter.ofPattern("hh:mm")
+                .format(ZonedDateTime.ofInstant(Instant.ofEpochSecond(averageTime), ZoneId.of("GMT")));
 
     }
 
@@ -34,7 +38,8 @@ public class TicketService {
         Collections.sort(timeOfFlights);
         int index = (int) Math.ceil(((double) percentile / 100) * timeOfFlights.size());
 
-        return new SimpleDateFormat("hh:mm").format(new Date(timeOfFlights.get(index - 1) * 1000));
+        return DateTimeFormatter.ofPattern("hh:mm")
+                .format(ZonedDateTime.ofInstant(Instant.ofEpochSecond(timeOfFlights.get(index - 1)), ZoneId.of("GMT")));
     }
 
     private void fullTimeOfFlights() {
@@ -47,7 +52,7 @@ public class TicketService {
             tickets.forEach(t -> timeOfFlights.add(t.getArrivalDate().toEpochSecond() - t.getDepartureDate().toEpochSecond()));
 
         } catch (JsonProcessingException e) {
-            throw new RuntimeException(e);
+            System.out.println(e.getMessage());
         }
     }
 

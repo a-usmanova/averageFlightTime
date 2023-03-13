@@ -28,7 +28,7 @@ public class CustomDeserializer extends StdDeserializer<ZonedDateTime> {
             if (value.matches("[0-9]{2}\\.[0-9]{2}\\.[0-9]{2}\\ [0-9]\\:[0-9]{2}")) {
                 formatter = DateTimeFormatter.ofPattern("dd.MM.yy H:mm");
             }
-            return LocalDateTime.parse(value, formatter).atZone(ZoneId.systemDefault());
+            return LocalDateTime.parse(value, formatter).atZone(ZoneId.of("GMT"));
 
         }
 }
